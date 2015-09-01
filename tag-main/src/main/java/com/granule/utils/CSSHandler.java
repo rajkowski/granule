@@ -16,11 +16,8 @@
 package com.granule.utils;
 
 /**
- * User: Dario Wunsch
- * Date: 14.07.2010
- * Time: 22:08:04
+ * User: Dario Wunsch Date: 14.07.2010 Time: 22:08:04
  */
-
 import com.granule.CompressorSettings;
 import com.granule.ExternalFragment;
 import com.granule.FragmentDescriptor;
@@ -35,8 +32,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+/*
+ $Id:$
+ */
 
+/**
+ *
+ * @author John Yeary <jyeary@bluelotussoftware.com>
+ * @version 1.0.13
+ */
 public final class CSSHandler {
+
     private static final String stringLiteralRegex = "(\"(?:\\.|[^\\\"])*\"|'(?:\\.|[^\\'])*')";
     private static final String urlRegex = String.format(
             "(?:url\\(\\s*(%s|[^)]*)\\s*\\))", stringLiteralRegex);
@@ -47,12 +53,12 @@ public final class CSSHandler {
             "(%s)|(%s)|%s", importRegex, urlRegex, stringLiteralRegex));
 
     private class ReplaceInfo {
+
         boolean isImport = false;
         int begin;
         int end;
         String text;
     }
-
 
     public void parse(String line, List<ReplaceInfo> replaces, int start) {
         Matcher m = regex.matcher(line);
@@ -80,24 +86,26 @@ public final class CSSHandler {
                     replace.text = cleanQuotesFromMatchString(m.group(7));
                     replace.begin = m.start(7) + start;
                     replace.end = m.end(7) + start;
-                    if (!PathUtils.isWebAddress(replace.text))
+                    if (!PathUtils.isWebAddress(replace.text)) {
                         replaces.add(replace);
+                    }
                 }
             } catch (IndexOutOfBoundsException e) { /* eat move on */ }
         }
     }
 
     private String cleanQuotesFromMatchString(String match) {
-        if (match.charAt(0) == '\'' || match.charAt(0) == '"')
+        if (match.charAt(0) == '\'' || match.charAt(0) == '"') {
             return match.substring(1, match.length() - 1);
+        }
         return match;
     }
 
     public String handle(FragmentDescriptor fd, IRequestProxy request, CompressorSettings settings,
-                         List<FragmentDescriptor> deps) throws JSCompileException {
+            List<FragmentDescriptor> deps) throws JSCompileException {
         try {
-            if (fd instanceof ExternalFragment && settings.isIgnoreMissedFiles() && 
-                    !(new File(request.getRealPath(((ExternalFragment) fd).getFilePath()))).exists()) {
+            if (fd instanceof ExternalFragment && settings.isIgnoreMissedFiles()
+                    && !(new File(request.getRealPath(((ExternalFragment) fd).getFilePath()))).exists()) {
                 logger.warn(MessageFormat.format("File {0} not found, ignored", ((ExternalFragment) fd).getFilePath()));
                 return "";
             }
@@ -110,20 +118,23 @@ public final class CSSHandler {
                 parse(line, replaces, startLine);
                 startLine += line.length() + 1;
             }
-            if (replaces.size() == 0)
+            if (replaces.isEmpty()) {
                 return css;
-            else {
+            } else {
                 int start = 0;
                 StringBuilder sb = new StringBuilder();
                 for (ReplaceInfo replaceInfo : replaces) {
                     sb.append(css.substring(start, replaceInfo.begin));
-                    if (!replaceInfo.isImport)
+                    //Check if the CSS element contains encoded data.
+                    if (replaceInfo.text.startsWith("data:")) {
+                        sb.append(replaceInfo.text);
+                    } else if (!replaceInfo.isImport) {
                         sb.append(PathUtils.clean(newPath + replaceInfo.text));
-                    else {
+                    } else {
                         boolean cyclicLink = false;
-                        String cssPath = PathUtils.clean(((newPath.length() > 0 && newPath.charAt(0) != '/') ? "/" :
-                                "") + newPath + replaceInfo.text);
-                        for (FragmentDescriptor dep : deps)
+                        String cssPath = PathUtils.clean(((newPath.length() > 0 && newPath.charAt(0) != '/') ? "/"
+                                : "") + newPath + replaceInfo.text);
+                        for (FragmentDescriptor dep : deps) {
                             if (dep instanceof ExternalFragment) {
                                 ExternalFragment ef = (ExternalFragment) dep;
                                 if (ef.getFilePath() != null && ef.getFilePath().equals(cssPath)) {
@@ -131,6 +142,7 @@ public final class CSSHandler {
                                     break;
                                 }
                             }
+                        }
                         if (cyclicLink) {
                             logger.error("Found cyclic link!!!!");
                             start = replaceInfo.end;
@@ -143,9 +155,11 @@ public final class CSSHandler {
                         }
                         if (addFile) {
                             String filename;
-                            if (replaceInfo.text.startsWith("/"))
+                            if (replaceInfo.text.startsWith("/")) {
                                 filename = replaceInfo.text;
-                            else filename = cssPath;
+                            } else {
+                                filename = cssPath;
+                            }
                             FragmentDescriptor imp = new ExternalFragment(filename);
                             deps.add(imp);
                             sb.append(handle(imp, request, settings, deps));
