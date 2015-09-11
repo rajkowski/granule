@@ -25,7 +25,6 @@ import com.granule.IRequestProxy;
 import com.granule.JSCompileException;
 import com.granule.logging.Logger;
 import com.granule.logging.LoggerFactory;
-
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -48,9 +47,15 @@ public final class CSSHandler {
             "(?:url\\(\\s*(%s|[^)]*)\\s*\\))", stringLiteralRegex);
     private static final String importRegex = String.format(
             "(?:@import\\s+(%s|%s))", urlRegex, stringLiteralRegex);
-
     private static final Pattern regex = Pattern.compile(String.format(
             "(%s)|(%s)|%s", importRegex, urlRegex, stringLiteralRegex));
+
+    /**
+     * A regular expression pattern representing a CSS <code>url()</code>
+     * function with a data URI such as <b>url("data:image/png;base64,...);</b>.
+     */
+    private static final String urlDataUriRegex = "url\\(\\s*[\"']?data:.*[\"']\\s*\\)";
+    private static final Pattern urlDataUriPattern = Pattern.compile(urlDataUriRegex);
 
     private class ReplaceInfo {
 
@@ -61,36 +66,45 @@ public final class CSSHandler {
     }
 
     public void parse(String line, List<ReplaceInfo> replaces, int start) {
-        Matcher m = regex.matcher(line);
 
-        while (m.find()) {
-            try {
-                if (m.group(3) != null) {
-                    ReplaceInfo replace = new ReplaceInfo();
-                    replace.isImport = true;
-                    replace.text = cleanQuotesFromMatchString(m.group(3));
-                    replace.begin = line.substring(0, m.start(3)).lastIndexOf("@import") + start;
-                    replace.end = line.substring(m.end(3)).indexOf(";") + m.end(3) + 1 + start;
-                    replaces.add(replace);
-                }
-                if (m.group(5) != null) {
-                    ReplaceInfo replace = new ReplaceInfo();
-                    replace.isImport = true;
-                    replace.text = cleanQuotesFromMatchString(m.group(5));
-                    replace.begin = line.substring(0, m.start(5)).lastIndexOf("@import") + start;
-                    replace.end = line.substring(m.end(5)).indexOf(";") + m.end(5) + 1 + start;
-                    replaces.add(replace);
-                }
-                if (m.group(7) != null) {
-                    ReplaceInfo replace = new ReplaceInfo();
-                    replace.text = cleanQuotesFromMatchString(m.group(7));
-                    replace.begin = m.start(7) + start;
-                    replace.end = m.end(7) + start;
-                    if (!PathUtils.isWebAddress(replace.text)) {
+        /*
+         * Parse the line for URL attribute with encoded data and skip 
+         * further processing. Failure to do so will result in a stackoverflow.
+         */
+        Matcher mdata = urlDataUriPattern.matcher(line);
+        if (!mdata.find()) {
+
+            Matcher m = regex.matcher(line);
+
+            while (m.find()) {
+                try {
+                    if (m.group(3) != null) {
+                        ReplaceInfo replace = new ReplaceInfo();
+                        replace.isImport = true;
+                        replace.text = cleanQuotesFromMatchString(m.group(3));
+                        replace.begin = line.substring(0, m.start(3)).lastIndexOf("@import") + start;
+                        replace.end = line.substring(m.end(3)).indexOf(";") + m.end(3) + 1 + start;
                         replaces.add(replace);
                     }
-                }
-            } catch (IndexOutOfBoundsException e) { /* eat move on */ }
+                    if (m.group(5) != null) {
+                        ReplaceInfo replace = new ReplaceInfo();
+                        replace.isImport = true;
+                        replace.text = cleanQuotesFromMatchString(m.group(5));
+                        replace.begin = line.substring(0, m.start(5)).lastIndexOf("@import") + start;
+                        replace.end = line.substring(m.end(5)).indexOf(";") + m.end(5) + 1 + start;
+                        replaces.add(replace);
+                    }
+                    if (m.group(7) != null) {
+                        ReplaceInfo replace = new ReplaceInfo();
+                        replace.text = cleanQuotesFromMatchString(m.group(7));
+                        replace.begin = m.start(7) + start;
+                        replace.end = m.end(7) + start;
+                        if (!PathUtils.isWebAddress(replace.text)) {
+                            replaces.add(replace);
+                        }
+                    }
+                } catch (IndexOutOfBoundsException e) { /* eat move on */ }
+            }
         }
     }
 
@@ -125,10 +139,7 @@ public final class CSSHandler {
                 StringBuilder sb = new StringBuilder();
                 for (ReplaceInfo replaceInfo : replaces) {
                     sb.append(css.substring(start, replaceInfo.begin));
-                    //Check if the CSS element contains encoded data.
-                    if (replaceInfo.text.startsWith("data:")) {
-                        sb.append(replaceInfo.text);
-                    } else if (!replaceInfo.isImport) {
+                    if (!replaceInfo.isImport) {
                         sb.append(PathUtils.clean(newPath + replaceInfo.text));
                     } else {
                         boolean cyclicLink = false;
