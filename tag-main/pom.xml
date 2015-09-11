@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.granule</groupId>
     <artifactId>granule</artifactId>
-    <version>1.0.15</version>
+    <version>1.0.16-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>granule</name>
-    <url>https://code.google.com/p/granule/</url>
+    <url>https://github.com/jyeary/Granule</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>

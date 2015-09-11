@@ -36,9 +36,9 @@ import java.util.regex.Pattern;
  */
 
 /**
- *
+ * @author Dario Wunsch
  * @author John Yeary <jyeary@bluelotussoftware.com>
- * @version 1.0.13
+ * @version 1.0.16
  */
 public final class CSSHandler {
 
