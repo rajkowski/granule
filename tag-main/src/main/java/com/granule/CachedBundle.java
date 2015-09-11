@@ -52,7 +52,7 @@ public class CachedBundle {
     private byte[] bundleValue;
     private String mimeType = JAVASCRIPT_MIME;
     private String options = null;
-    private static final String JAVASCRIPT_MIME = "application/x-javascript";
+    private static final String JAVASCRIPT_MIME = "application/javascript";
     private static final String CSS_MIME = "text/css";
 
     private static final long ZIP_ERROR_COMPENSATION = 10 * 1000;//10 seconds
