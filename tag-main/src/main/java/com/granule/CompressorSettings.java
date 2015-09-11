@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 Granule Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,6 +15,7 @@
  */
 package com.granule;
 
+import com.granule.utils.Utf8Properties;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,12 +25,16 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.granule.utils.Utf8Properties;
-
-/**
+/*
  * User: Dario Wunsch Date: 22.06.2010 Time: 22:09:21
  */
+/**
+ * @author Dario Wunsch
+ * @author Srinivasa Rao Boyina
+ * @author John Yeary <jyeary@bluelotussoftware.com>
+ */
 public class CompressorSettings {
+
     private String jsCompressMethod = JSFASTMIN_VALUE;
     private String cssCompressMethod = CSSFASTMIN_VALUE;
     private String cache = MEMORY_VALUE;
@@ -49,8 +54,8 @@ public class CompressorSettings {
     private String cacheFileLocation = null;
     private String tagName = DEFAULT_TAG_NAME;
     private String contextRoot = null;
-	private String basePath = null;
-	private boolean gzipOutput = true;
+    private String basePath = null;
+    private boolean gzipOutput = true;
 
     public static final String NONE_VALUE = "none";
     public static final String CLOSURE_COMPILER_VALUE = "closure-compiler";
@@ -61,7 +66,7 @@ public class CompressorSettings {
     public static final String CACHE_KEY = "cache";
     public static final String MEMORY_VALUE = "memory";
     public static final String DISK_CACHE_VALUE = "disk";
-    public static final String DISK_CACHE_VALUE_ADD2= "file";
+    public static final String DISK_CACHE_VALUE_ADD2 = "file";
     public static final String IGNORE_VALUE = "ignore";
     public static final String ALL_VALUE = "all";
     public static final String JAVASCRIPT_VALUE = "javascript";
@@ -90,6 +95,23 @@ public class CompressorSettings {
     public static final String CONTEXTROOT_KEY = "contextroot";
     public static final String BASEPATH_KEY = "basepath";
     public static final String GZIP_OUTPUT_KEY = "gzip.output";
+
+    /**
+     * Constructor
+     * @param in
+     * @throws IOException 
+     */
+    public CompressorSettings(InputStream in) throws IOException {
+        load(in);
+    }
+    /**
+     * Constructor
+     * @param props
+     * @throws IOException 
+     */
+    public CompressorSettings(Utf8Properties props) throws IOException {
+        load(props);
+    }
 
     public String getJsCompressMethod() {
         return jsCompressMethod;
@@ -133,10 +155,10 @@ public class CompressorSettings {
 
     public String getTagName() {
         return tagName;
-    }   
+    }
 
     /**
-     * @return Returns the gzipOutput.
+     * @return {@code true} if Gzip is enabled and {@code false} otherwise.
      */
     public boolean isGzipOutput() {
         return gzipOutput;
@@ -152,12 +174,13 @@ public class CompressorSettings {
     public void load(Utf8Properties props) throws IOException {
         String readed;
         String mode = ALL_VALUE;
-        
+
         if (props.containsKey(TAG_PROCESS_KEY)) {
             readed = props.getProperty(TAG_PROCESS_KEY);
             if (ALL_VALUE.equalsIgnoreCase(readed) || JAVASCRIPT_VALUE.equalsIgnoreCase(readed)
-                    || CSS_VALUE.equalsIgnoreCase(readed) || IGNORE_VALUE.equalsIgnoreCase(readed))
+                    || CSS_VALUE.equalsIgnoreCase(readed) || IGNORE_VALUE.equalsIgnoreCase(readed)) {
                 mode = readed;
+            }
             if (ALL_VALUE.equalsIgnoreCase(mode)) {
                 handleJavascript = true;
                 handleCss = true;
@@ -175,20 +198,23 @@ public class CompressorSettings {
 
         if (props.containsKey(TAG_METHOD_CSS_KEY)) {
             readed = props.getProperty(TAG_METHOD_CSS_KEY);
-            if (COMBINE_VALUE.equalsIgnoreCase(readed) || CSSFASTMIN_VALUE.equalsIgnoreCase(readed))
+            if (COMBINE_VALUE.equalsIgnoreCase(readed) || CSSFASTMIN_VALUE.equalsIgnoreCase(readed)) {
                 cssCompressMethod = readed;
+            }
         }
 
-        if (props.containsKey(COMPRESS_METHOD_TIMESTAMP_CHECK_KEY))
+        if (props.containsKey(COMPRESS_METHOD_TIMESTAMP_CHECK_KEY)) {
             checkTimestamps = getBoolean(props.getProperty(COMPRESS_METHOD_TIMESTAMP_CHECK_KEY), checkTimestamps);
+        }
 
         if (props.containsKey(JS_COMPRESS_METHOD_KEY)) {
             readed = props.getProperty(JS_COMPRESS_METHOD_KEY);
             if (COMBINE_VALUE.equalsIgnoreCase(readed)
                     || CLOSURE_COMPILER_VALUE.equalsIgnoreCase(readed)
                     || JSFASTMIN_VALUE.equalsIgnoreCase(readed)
-                    || AUTO_VALUE.equalsIgnoreCase(readed))
+                    || AUTO_VALUE.equalsIgnoreCase(readed)) {
                 jsCompressMethod = readed;
+            }
         }
 
         if (props.containsKey(CACHE_KEY)) {
@@ -196,57 +222,70 @@ public class CompressorSettings {
             if (NONE_VALUE.equalsIgnoreCase(readed)
                     || MEMORY_VALUE.equalsIgnoreCase(readed)
                     || DISK_CACHE_VALUE.equalsIgnoreCase(readed)
-                    || DISK_CACHE_VALUE_ADD2.equalsIgnoreCase(readed))
-                if (DISK_CACHE_VALUE_ADD2.equalsIgnoreCase(readed))
-                	readed=DISK_CACHE_VALUE;
-            	cache = readed;
+                    || DISK_CACHE_VALUE_ADD2.equalsIgnoreCase(readed)) {
+                if (DISK_CACHE_VALUE_ADD2.equalsIgnoreCase(readed)) {
+                    readed = DISK_CACHE_VALUE;
+                }
+            }
+            cache = readed;
         }
 
-        if (props.containsKey(CLOSURE_COMPILER_FORMATTING_PRETTY_PRINT_KEY))
+        if (props.containsKey(CLOSURE_COMPILER_FORMATTING_PRETTY_PRINT_KEY)) {
             formatPrettyPrint = getBoolean(props.getProperty(CLOSURE_COMPILER_FORMATTING_PRETTY_PRINT_KEY),
                     formatPrettyPrint);
+        }
 
-        if (props.containsKey(CLOSURE_COMPILER_FORMATTING_PRINT_INPUT_DELIMITER_KEY))
+        if (props.containsKey(CLOSURE_COMPILER_FORMATTING_PRINT_INPUT_DELIMITER_KEY)) {
             formatPrintInputDelimiter = getBoolean(props
                     .getProperty(CLOSURE_COMPILER_FORMATTING_PRINT_INPUT_DELIMITER_KEY), formatPrintInputDelimiter);
+        }
 
-        if (props.containsKey(CLOSURE_COMPILER_LOCALE_KEY))
+        if (props.containsKey(CLOSURE_COMPILER_LOCALE_KEY)) {
             locale = props.getProperty(CLOSURE_COMPILER_LOCALE_KEY);
+        }
 
         if (props.containsKey(CLOSURE_COMPILER_COMPILATION_LEVEL_KEY)) {
             readed = props.getProperty(CLOSURE_COMPILER_COMPILATION_LEVEL_KEY);
             if (SIMPLE_OPTIMIZATIONS_VALUE.equalsIgnoreCase(readed)
                     || WHITESPACE_ONLY_VALUE.equalsIgnoreCase(readed)
-                    || ADVANCED_OPTIMIZATIONS_VALUE.equalsIgnoreCase(readed))
+                    || ADVANCED_OPTIMIZATIONS_VALUE.equalsIgnoreCase(readed)) {
                 optimization = readed;
+            }
         }
-        
-        if (props.containsKey(CLOSURE_COMPILER_OUTPUT_WRAPPER_KEY))
+
+        if (props.containsKey(CLOSURE_COMPILER_OUTPUT_WRAPPER_KEY)) {
             outputWrapper = props.getProperty(CLOSURE_COMPILER_OUTPUT_WRAPPER_KEY);
+        }
 
-        if (props.containsKey(TAG_CSS_CLEANDUPLICATES_KEY))
+        if (props.containsKey(TAG_CSS_CLEANDUPLICATES_KEY)) {
             cleanCssDuplicates = getBoolean(props.getProperty(TAG_CSS_CLEANDUPLICATES_KEY), cleanCssDuplicates);
+        }
 
-        if (props.containsKey(TAG_JS_CLEANDUPICATES_KEY))
+        if (props.containsKey(TAG_JS_CLEANDUPICATES_KEY)) {
             cleanJsDuplicates = getBoolean(props.getProperty(TAG_JS_CLEANDUPICATES_KEY), cleanJsDuplicates);
+        }
 
         readFileListProperty(props, CLOSURE_ADD_PATH_KEY, closurePathes);
-        
+
         readFileListProperty(props, KEEP_FIRST_COMMENT_PATH_KEY, keepFirstCommentPathes);
 
-        if (props.containsKey(IGNORE_MISSED_FILES_KEY))
+        if (props.containsKey(IGNORE_MISSED_FILES_KEY)) {
             ignoreMissedFiles = getBoolean(props.getProperty(IGNORE_MISSED_FILES_KEY), ignoreMissedFiles);
-        
-        if (props.containsKey(CACHE_FILE_LOCATION_KEY))
+        }
+
+        if (props.containsKey(CACHE_FILE_LOCATION_KEY)) {
             cacheFileLocation = props.getProperty(CACHE_FILE_LOCATION_KEY);
-        
-        if (props.containsKey(TAG_NAME_KEY))
+        }
+
+        if (props.containsKey(TAG_NAME_KEY)) {
             tagName = props.getProperty(TAG_NAME_KEY);
-        
-        if (props.containsKey(CONTEXTROOT_KEY))
-        	contextRoot = props.getProperty(CONTEXTROOT_KEY);
-        
-        if(props.containsKey(GZIP_OUTPUT_KEY)){
+        }
+
+        if (props.containsKey(CONTEXTROOT_KEY)) {
+            contextRoot = props.getProperty(CONTEXTROOT_KEY);
+        }
+
+        if (props.containsKey(GZIP_OUTPUT_KEY)) {
             gzipOutput = getBoolean(props.getProperty(GZIP_OUTPUT_KEY), gzipOutput);
         }
     }
@@ -262,8 +301,9 @@ public class CompressorSettings {
             st.quoteChar('\"');
             st.quoteChar('\'');
             st.eolIsSignificant(false);
-            while (st.nextToken() != StreamTokenizer.TT_EOF)
+            while (st.nextToken() != StreamTokenizer.TT_EOF) {
                 list.add(st.sval);
+            }
         }
     }
 
@@ -274,24 +314,18 @@ public class CompressorSettings {
         load(props);
     }
 
-    public CompressorSettings(InputStream in) throws IOException {
-        load(in);
-    }
-
-    public CompressorSettings(Utf8Properties props) throws IOException {
-        load(props);
-    }
-
     public void setJsCompressMethod(String newMethod) {
         jsCompressMethod = newMethod;
-        if (jsCompressMethod == null)
+        if (jsCompressMethod == null) {
             jsCompressMethod = COMBINE_VALUE;
-        else
+        } else {
             jsCompressMethod = jsCompressMethod.toLowerCase();
+        }
         if (!jsCompressMethod.equalsIgnoreCase(COMBINE_VALUE)
                 && !jsCompressMethod.equalsIgnoreCase(CLOSURE_COMPILER_VALUE)
-                && !jsCompressMethod.equalsIgnoreCase(JSFASTMIN_VALUE))
+                && !jsCompressMethod.equalsIgnoreCase(JSFASTMIN_VALUE)) {
             jsCompressMethod = COMBINE_VALUE;
+        }
     }
 
     public boolean isHandleJavascript() {
@@ -325,29 +359,30 @@ public class CompressorSettings {
     public String getCacheFileLocation() {
         return cacheFileLocation;
     }
- 
+
     public String getContextRoot() {
-		return contextRoot;
-	}
+        return contextRoot;
+    }
 
-	public String getBasePath() {
-		return basePath;
-	}
+    public String getBasePath() {
+        return basePath;
+    }
 
-    
     public static boolean getBoolean(String str, boolean defaultvalue) {
         boolean result = "yes".equalsIgnoreCase(str)
                 || "on".equalsIgnoreCase(str)
                 || "true".equalsIgnoreCase(str)
                 || "1".equalsIgnoreCase(str);
-        if (result)
+        if (result) {
             return true;
+        }
         result = "no".equalsIgnoreCase(str)
                 || "off".equalsIgnoreCase(str)
                 || "false".equalsIgnoreCase(str)
                 || "0".equalsIgnoreCase(str);
-        if (result)
+        if (result) {
             return false;
+        }
         return defaultvalue;
     }
 

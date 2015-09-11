@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 Granule Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -21,7 +21,6 @@ import com.granule.json.JSONException;
 import com.granule.json.JSONObject;
 import com.granule.logging.Logger;
 import com.granule.logging.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -35,12 +34,18 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-/**
+/*
  * User: Dario Wunsch
  * Date: 23.06.2010
  * Time: 2:00:08
  */
+/**
+ * @author Dario Wunsch
+ * @author Srinivasa Rao Boyina
+ * @author John Yeary <jyeary@bluelotussoftware.com>
+ */
 public class CachedBundle {
+
     private long modifyDate = 0;
     private List<FragmentDescriptor> fragments;
     private List<FragmentDescriptor> dependentFragments = new ArrayList<FragmentDescriptor>();
@@ -50,8 +55,8 @@ public class CachedBundle {
     private static final String JAVASCRIPT_MIME = "application/x-javascript";
     private static final String CSS_MIME = "text/css";
 
-    private static final long ZIP_ERROR_COMPENSATION = 10*1000;//10 seconds 
-   
+    private static final long ZIP_ERROR_COMPENSATION = 10 * 1000;//10 seconds
+
     public byte[] getBundleValue() {
         return bundleValue;
     }
@@ -69,22 +74,28 @@ public class CachedBundle {
     }
 
     protected static long calcModifyDate(List<FragmentDescriptor> fragments, List<FragmentDescriptor> deps,
-                                      IRequestProxy request) {
+            IRequestProxy request) {
         long d = 0;
-        if (fragments != null)
+        if (fragments != null) {
             for (FragmentDescriptor fd : fragments) {
                 if (fd instanceof ExternalFragment) {
                     File f = new File(request.getRealPath(((ExternalFragment) fd).getFilePath()));
-                    if (f.lastModified() > d) d = f.lastModified();
+                    if (f.lastModified() > d) {
+                        d = f.lastModified();
+                    }
                 }
             }
-        if (deps != null)
+        }
+        if (deps != null) {
             for (FragmentDescriptor fd : deps) {
                 if (fd instanceof ExternalFragment) {
                     File f = new File(request.getRealPath(((ExternalFragment) fd).getFilePath()));
-                    if (f.lastModified() > d) d = f.lastModified();
+                    if (f.lastModified() > d) {
+                        d = f.lastModified();
+                    }
                 }
             }
+        }
         return d;
     }
 
@@ -95,49 +106,64 @@ public class CachedBundle {
         String text = "";
         List<FragmentDescriptor> list = cd.calcDeps(fragments, request, settings.getClosurePathes());
         boolean isGoogleClosurePresent = !list.equals(fragments);
-        if (isGoogleClosurePresent)
+        if (isGoogleClosurePresent) {
             list.add(0, new InternalFragment("CLOSURE_NO_DEPS=true;\n"));
-        if (settings.getJsCompressMethod().equals(CompressorSettings.CLOSURE_COMPILER_VALUE))
+        }
+        if (settings.getJsCompressMethod().equals(CompressorSettings.CLOSURE_COMPILER_VALUE)) {
             text = Compressor.compile(list, request, settings);
-        else if (settings.getJsCompressMethod().equals(CompressorSettings.JSFASTMIN_VALUE))
+        } else if (settings.getJsCompressMethod().equals(CompressorSettings.JSFASTMIN_VALUE)) {
             text = Compressor.minifyJs(list, settings, request);
-        else if (settings.getJsCompressMethod().equalsIgnoreCase(CompressorSettings.AUTO_VALUE)) {
-            if (isGoogleClosurePresent) text = Compressor.compile(list, request, settings);
-            else text = Compressor.minifyJs(list, settings, request);
-        } else text = Compressor.unify(list, request);
-        if (isGoogleClosurePresent)
+        } else if (settings.getJsCompressMethod().equalsIgnoreCase(CompressorSettings.AUTO_VALUE)) {
+            if (isGoogleClosurePresent) {
+                text = Compressor.compile(list, request, settings);
+            } else {
+                text = Compressor.minifyJs(list, settings, request);
+            }
+        } else {
+            text = Compressor.unify(list, request);
+        }
+        if (isGoogleClosurePresent) {
             list.remove(0);
+        }
         dependentFragments.clear();
         HashSet<String> hash = new HashSet<String>();
-        for (FragmentDescriptor fd : fragments)
-            if (fd instanceof ExternalFragment) hash.add(((ExternalFragment) fd).getFilePath());
-        for (FragmentDescriptor dep : list)
-            if (dep instanceof ExternalFragment && !hash.contains("/" + ((ExternalFragment) dep).getFilePath()))
+        for (FragmentDescriptor fd : fragments) {
+            if (fd instanceof ExternalFragment) {
+                hash.add(((ExternalFragment) fd).getFilePath());
+            }
+        }
+        for (FragmentDescriptor dep : list) {
+            if (dep instanceof ExternalFragment && !hash.contains("/" + ((ExternalFragment) dep).getFilePath())) {
                 dependentFragments.add(dep);
+            }
+        }
         try {
             bundleValue = gzip(text);
         } catch (IOException e) {
             throw new JSCompileException(e);
         }
 
-        this.modifyDate=calcModifyDate(request);
+        this.modifyDate = calcModifyDate(request);
     }
 
     public void compile(CompressorSettings settings, IRequestProxy request) throws JSCompileException {
         dependentFragments.clear();
-        if (mimeType != null && mimeType.equals(JAVASCRIPT_MIME))
+        if (mimeType != null && mimeType.equals(JAVASCRIPT_MIME)) {
             compileScript(settings, request);
-        else compileCss(settings, request);
+        } else {
+            compileCss(settings, request);
+        }
     }
 
     public void compileCss(CompressorSettings settings, IRequestProxy request) throws JSCompileException {
         logger.debug("Start compile css");
         mimeType = CSS_MIME;
         String text = "";
-        if (settings.getCssCompressMethod().equals(CompressorSettings.CSSFASTMIN_VALUE))
+        if (settings.getCssCompressMethod().equals(CompressorSettings.CSSFASTMIN_VALUE)) {
             text = Compressor.minifyCss(fragments, dependentFragments, settings, request);
-        else
+        } else {
             text = Compressor.unifyCss(fragments, dependentFragments, settings, request);
+        }
 
         try {
             bundleValue = gzip(text);
@@ -145,7 +171,7 @@ public class CachedBundle {
             throw new JSCompileException(e);
         }
 
-        this.modifyDate=calcModifyDate(request);
+        this.modifyDate = calcModifyDate(request);
     }
 
     private static byte[] gzip(String text) throws IOException {
@@ -160,14 +186,15 @@ public class CachedBundle {
         final int BLOCKSIZE = 8192;
         byte[] buffer = new byte[BLOCKSIZE];
         GZIPInputStream gzis = new GZIPInputStream(new ByteArrayInputStream(bundleValue));
-        for (int length; (length = gzis.read(buffer, 0, BLOCKSIZE)) != -1;)
+        for (int length; (length = gzis.read(buffer, 0, BLOCKSIZE)) != -1;) {
             out.write(buffer, 0, length);
+        }
         gzis.close();
     }
 
     public boolean isChanged(IRequestProxy request) {
         long d = calcModifyDate(fragments, dependentFragments, request);
-        return d > modifyDate+ZIP_ERROR_COMPENSATION;
+        return d > modifyDate + ZIP_ERROR_COMPENSATION;
     }
 
     public String getMimeType() {
@@ -190,15 +217,19 @@ public class CachedBundle {
         JSONObject obj = new JSONObject();
         obj.put("id", id);
         obj.put("mime-type", mimeType);
-        if (options != null)
+        if (options != null) {
             obj.put("options", options);
+        }
         if (fragments.size() > 0) {
             JSONArray array = new JSONArray();
             for (FragmentDescriptor fd : fragments) {
                 JSONObject o = new JSONObject();
                 o.put("type", fd instanceof ExternalFragment ? "file" : "script");
-                if (fd instanceof ExternalFragment) o.put("file", ((ExternalFragment) fd).getFilePath());
-                else o.put("text", ((InternalFragment) fd).getText());
+                if (fd instanceof ExternalFragment) {
+                    o.put("file", ((ExternalFragment) fd).getFilePath());
+                } else {
+                    o.put("text", ((InternalFragment) fd).getText());
+                }
                 array.put(o);
             }
             obj.put("fragments", array);
@@ -217,9 +248,11 @@ public class CachedBundle {
 
     public void loadFromJSON(JSONObject obj, String cacheFolder) throws JSONException, IOException {
         mimeType = obj.getString("mime-type");
-        if (obj.has("options"))
+        if (obj.has("options")) {
             options = obj.getString("options");
-        else options = null;
+        } else {
+            options = null;
+        }
         fragments = new ArrayList<FragmentDescriptor>();
         if (obj.has("fragments")) {
             JSONArray array = obj.getJSONArray("fragments");
@@ -275,8 +308,8 @@ public class CachedBundle {
     }
 
     public void setModifyDate(long modifyDate) {
-        this.modifyDate=modifyDate;
+        this.modifyDate = modifyDate;
     }
-    
+
     private static final Logger logger = LoggerFactory.getLogger(CachedBundle.class);
 }
