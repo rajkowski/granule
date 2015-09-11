@@ -98,16 +98,19 @@ public class CompressorSettings {
 
     /**
      * Constructor
+     *
      * @param in
-     * @throws IOException 
+     * @throws IOException
      */
     public CompressorSettings(InputStream in) throws IOException {
         load(in);
     }
+
     /**
      * Constructor
+     *
      * @param props
-     * @throws IOException 
+     * @throws IOException
      */
     public CompressorSettings(Utf8Properties props) throws IOException {
         load(props);
@@ -165,7 +168,8 @@ public class CompressorSettings {
     }
 
     /**
-     * @param gzipOutput The gzipOutput to set.
+     * @param gzipOutput Set this value to {@code true} to enable compression,
+     * and {@code false} to disable.
      */
     public void setGzipOutput(boolean gzipOutput) {
         this.gzipOutput = gzipOutput;
