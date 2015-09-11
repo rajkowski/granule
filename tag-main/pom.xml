@@ -174,10 +174,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.granule</groupId>
-            <artifactId>granule</artifactId>
-            <version>1.0.13-SNAPSHOT</version>
-            <type>jar</type>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
