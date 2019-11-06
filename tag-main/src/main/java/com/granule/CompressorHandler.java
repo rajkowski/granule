@@ -50,9 +50,22 @@ public class CompressorHandler {
                 return;
             }
 
+            // Check for a last-modified header and return 304 if possible
+            long lastModified = bundle.getModifyDate();
+            if (lastModified > 0) {
+                long headerValue = request.getDateHeader("If-Modified-Since");
+                if (lastModified <= headerValue + 1000) {
+                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    return;
+                }
+            }
             response.setHeader("Content-Type", bundle.getMimeType() + "; charset=utf-8");
+            if (lastModified > 0) {
+                response.setDateHeader("Last-Modified", lastModified);
+            } else {
+                HttpHeaders.setCacheExpireDate(response, 6048000);
+            }
             response.setHeader("ETag", DigestUtils.md5Hex(bundle.getBundleValue()));
-            HttpHeaders.setCacheExpireDate(response, 6048000);
 
             OutputStream os = response.getOutputStream();
             try {
@@ -71,14 +84,14 @@ public class CompressorHandler {
 
     private boolean gzipSupported(HttpServletRequest request) {
         String acceptEncoding = request.getHeader("Accept-Encoding");
-        if (acceptEncoding == null || acceptEncoding.indexOf("gzip") == -1) {
+        if (acceptEncoding == null || !acceptEncoding.contains("gzip")) {
             return false;
         }
         String userAgent = request.getHeader("user-agent");
         if (userAgent == null) {
             return false;
         }
-        if (userAgent.indexOf("MSIE 6") != -1 && userAgent.indexOf("SV1") == -1) {
+        if (userAgent.contains("MSIE 6") && !userAgent.contains("SV1")) {
             return false;
         }
         return true;
