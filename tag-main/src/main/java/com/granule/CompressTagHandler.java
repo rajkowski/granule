@@ -107,7 +107,7 @@ public class CompressTagHandler {
                             //System.out.println("src="+src+"\npath="+path+"\nrealPath="+requestProxy.getRealPath(path)+"\ncontextPath="+requestProxy.getContextPath());
                             if (settings.isIgnoreMissedFiles() && !file.exists()) {
                                 addFile = false;
-                                logger.warn(MessageFormat.format("File {0} not found, ignored. Real Path={1}", path, requestProxy.getRealPath(path)));
+                                logger.warn(MessageFormat.format("JS File {0} not found, ignored. Real Path={1}", path, requestProxy.getRealPath(path)));
                             }
                             if (addFile) {
                                 desc = new ExternalFragment(path);
@@ -302,7 +302,7 @@ public class CompressTagHandler {
                         eliminatedStyles.add(i);
                     } else if (settings.isIgnoreMissedFiles() && !(new File(requestProxy.getRealPath(path))).exists()) {
                         eliminatedStyles.add(i);
-                        logger.warn(MessageFormat.format("File {0} not found, ignored. Real Path={1}", path, requestProxy.getRealPath(path)));
+                        logger.warn(MessageFormat.format("CSS File {0} not found, ignored. Real Path={1}", path, requestProxy.getRealPath(path)));
                     } else {
                         FragmentDescriptor bd = new ExternalFragment(path);
                         md.fragments.add(bd);
