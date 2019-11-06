@@ -23,16 +23,23 @@ public class PathUtilsTest extends TestCase {
  
   public void testSlash() {	 
 	  testClean("/aa", "/aa");
-	  testClean("./aa", "./aa");
+	  testClean("./aa", "aa");
 	  testClean("c:/aa", "c:/aa");
 	  testClean("c:\\aa//", "c:/aa/");
 	  testClean("c:/aa/.\\", "c:/aa/");	
+	  testClean("/aa/bb/./cc/test.css", "/aa/bb/cc/test.css");
   }
   
   public void testBack() {
+		testClean("/assets/img/1564170993625-99/home-gray-sails.png", "/assets/img/1564170993625-99/home-gray-sails.png");
+		testClean("/aa/bbb/ccc/../../ddd//fff", "/aa/ddd/fff");
+	  testClean(
+	  		"css/fontawesome-pro-5.8.1-web/../../fonts/fontawesome-pro-5.8.1-web/fa-brands-400.eot",
+				"fonts/fontawesome-pro-5.8.1-web/fa-brands-400.eot");
+	  testClean("../../fonts/fontawesome-pro-5.8.1-web/fa-brands-400.woff2", "fonts/fontawesome-pro-5.8.1-web/fa-brands-400.woff2");
 	  testClean("c:/aa/..\\", "c:/");
 	  testClean("css/../images/yolko.jpg","images/yolko.jpg");
-	  testClean(".\\css/../images/yolko.jpg","./images/yolko.jpg");
+	  testClean(".\\css/../images/yolko.jpg","images/yolko.jpg");
 	  testClean("/css/../images/yolko.jpg","/images/yolko.jpg");
 	  testClean("/\\aa/bbb/./ccc/..\\../ddd//fff", "/aa/ddd/fff");
   }

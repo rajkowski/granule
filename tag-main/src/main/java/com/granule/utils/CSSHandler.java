@@ -138,9 +138,16 @@ public final class CSSHandler {
                 int start = 0;
                 StringBuilder sb = new StringBuilder();
                 for (ReplaceInfo replaceInfo : replaces) {
-                    sb.append(css.substring(start, replaceInfo.begin));
+                    sb.append(css, start, replaceInfo.begin);
                     if (!replaceInfo.isImport) {
-                        sb.append(PathUtils.clean(newPath + replaceInfo.text));
+                        // Determine if this url has a root path
+                        if (replaceInfo.text.startsWith("/")) {
+                            // Targets a root asset
+                            sb.append(PathUtils.clean(replaceInfo.text));
+                        } else {
+                            // Targets a relative asset
+                            sb.append(PathUtils.clean(newPath + replaceInfo.text));
+                        }
                     } else {
                         boolean cyclicLink = false;
                         String cssPath = PathUtils.clean(((newPath.length() > 0 && newPath.charAt(0) != '/') ? "/"

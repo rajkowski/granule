@@ -58,27 +58,35 @@ public class PathUtils {
 	 * @return
 	 */
 	private static String cleanParentFolders(String path) {
-		StringTokenizer tokenizer = new StringTokenizer(path, "./", true);
+		StringTokenizer tokenizer = new StringTokenizer(path, "/", true);
 		ArrayList<String> tokens = new ArrayList<String>();
 		int count = 0;
 		int dots = 0;
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
-			if (token.equals(".")) {
+			if (token.equals("..")) {
+				dots += 2;
+			} else if (token.equals(".")) {
 				dots++;
 			} else {
-				if (dots == 2 && token.equals("/")) {		
-					count -= 4;
+				if (dots == 1 && token.equals("/")) {
+					count -= 2;
+					if (count<0) count=0;
+					dots=0;
+					continue;
+				} else if (dots == 2 && token.equals("/")) {
+					count -= 3;
 					if (count<0) count=0;
 					dots=0;
 					continue;
 				}
 				dots = 0;
 			}
-			if (count > tokens.size() - 1)
+			if (count > tokens.size() - 1) {
 				tokens.add(token);
-			else
+			} else {
 				tokens.set(count, token);
+			}
 			count++;
 		}
 		StringBuilder sb = new StringBuilder();
