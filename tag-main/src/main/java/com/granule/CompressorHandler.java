@@ -36,7 +36,7 @@ public class CompressorHandler {
 
     public void handle(HttpServletRequest request, HttpServletResponse response, String id) throws IOException, ServletException {
         if (id != null) {
-            CompressorSettings settings = TagCacheFactory.getCompressorSettings(request.getSession().getServletContext().getRealPath("/"));
+            CompressorSettings settings = TagCacheFactory.getCompressorSettings(request.getServletContext().getRealPath("/"));
 
             CachedBundle bundle;
             try {

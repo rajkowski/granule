@@ -54,7 +54,7 @@ public class CompressFilter implements Filter {
         int pathLength = path.length();
 		int slashPosition = path.lastIndexOf("/");
 		if (pathLength > 0 && slashPosition > 0) isRealPath = true;
-        if (!isRealPath && (new File(httpRequest.getSession().getServletContext().getRealPath(path)).exists()))
+        if (!isRealPath && (new File(httpRequest.getServletContext().getRealPath(path)).exists()))
             isRealPath = true;
         if (isRealPath) {
             chain.doFilter(request, response);
