@@ -178,7 +178,7 @@ public class FileCache extends TagCacheImpl {
 					bundles.put(id, cs);
 				} catch (Exception e) {
 					needRebuildCache = true;
-					logger.error("Could not load bundle from catalog:", e);
+					logger.error("Could not load bundle from catalog: " + e.getMessage());
 				}
 			}
 		} finally {
