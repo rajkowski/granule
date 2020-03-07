@@ -538,7 +538,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(long value) {
-        this.add(new Long(value));
+        this.add(value);
         return this;
     }
 
@@ -549,7 +549,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(int index, long value) {
-        this.add(index, new Long(value));
+        this.add(index, value);
         return this;
     }
 
@@ -559,7 +559,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(int value) {
-        this.add(new Integer(value));
+        this.add(value);
         return this;
     }
 
@@ -570,7 +570,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(int index, int value) {
-        this.add(index, new Integer(value));
+        this.add(index, value);
         return this;
     }
 
@@ -580,7 +580,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(short value) {
-        this.add(new Short(value));
+        this.add(value);
         return this;
     }
 
@@ -591,7 +591,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(int index, short value) {
-        this.add(index, new Short(value));
+        this.add(index, value);
         return this;
     }
 
@@ -601,7 +601,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(double value) {
-        this.add(new Double(value));
+        this.add(value);
         return this;
     }
 
@@ -612,7 +612,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(int index, double value) {
-        this.add(index, new Double(value));
+        this.add(index, value);
         return this;
     }
 
@@ -622,7 +622,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(boolean value) {
-        this.add(new Boolean(value));
+        this.add(value);
         return this;
     }
 
@@ -633,7 +633,7 @@ public class JSONArray extends ArrayList implements JSONArtifact {
      * @return A reference to this array instance.
      */
     public JSONArray put(int index, boolean value) {
-        this.add(index, new Boolean(value));
+        this.add(index, Boolean.valueOf(value));
         return this;
     }
 

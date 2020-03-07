@@ -29,7 +29,7 @@ import java.util.Stack;
 import com.granule.json.internal.BeanSerializer;
 
 /**
- * This class implements a JSONWrier, a convenience function for writing out JSON
+ * This class implements a JSONWriter, a convenience function for writing out JSON
  * to a writer or underlying stream.
  */
 public class JSONWriter {
@@ -91,7 +91,7 @@ public class JSONWriter {
     /**
      * Open a new JSON Array in the output stream.
      * @throws IOException Thrown if an error occurs on the underlying writer.
-     * @throws IllegalstateException Thrown if the current writer position does not permit an array.
+     * @throws IllegalStateException Thrown if the current writer position does not permit an array.
      * @return A reference to this writer.
      */
     public JSONWriter array() throws IOException, IllegalStateException {
