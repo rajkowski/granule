@@ -15,14 +15,6 @@
  */
 package com.granule;
 
-import com.google.javascript.jscomp.CompilationLevel;
-import com.google.javascript.jscomp.Compiler;
-import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.JSSourceFile;
-import com.google.javascript.jscomp.Result;
-import com.granule.utils.CSSHandler;
-import com.granule.utils.PathUtils;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,6 +26,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.javascript.jscomp.CompilationLevel;
+import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.SourceFile;
+import com.granule.utils.CSSHandler;
+import com.granule.utils.PathUtils;
+
 /**
  * User: Dario Wunsch
  * Date: 07.06.2010
@@ -42,35 +42,36 @@ import java.util.Set;
 public class Compressor {
 
     public static String compile(List<FragmentDescriptor> scripts, IRequestProxy request,
-                                 CompressorSettings settings) throws JSCompileException {
+            CompressorSettings settings) throws JSCompileException {
         Compiler compiler = new Compiler();
 
         CompilerOptions options = new CompilerOptions();
         options.markAsCompiled = true;
         if (settings.getLocale() != null)
             options.locale = settings.getLocale();
-        options.prettyPrint = settings.isFormatPrettyPrint();
+        options.setPrettyPrint(settings.isFormatPrettyPrint());
         options.printInputDelimiter = settings.isFormatPrintInputDelimiter();
         if (settings.getOptimization() != null) {
             if (settings.getOptimization().equalsIgnoreCase(CompressorSettings.ADVANCED_OPTIMIZATIONS_VALUE))
                 CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
             else if (settings.getOptimization().equalsIgnoreCase(CompressorSettings.WHITESPACE_ONLY_VALUE))
                 CompilationLevel.WHITESPACE_ONLY.setOptionsForCompilationLevel(options);
-            else CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
+            else
+                CompilationLevel.SIMPLE_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
         }
 
-        List<JSSourceFile> sources = new ArrayList<JSSourceFile>();
+        List<SourceFile> sources = new ArrayList<SourceFile>();
         for (FragmentDescriptor sd : scripts) {
-            JSSourceFile input;
+            SourceFile input;
             if (sd instanceof ExternalFragment)
-                input = JSSourceFile.fromFile(request.getRealPath(((ExternalFragment) sd).getFilePath()));
+                input = SourceFile.fromFile(request.getRealPath(((ExternalFragment) sd).getFilePath()));
             else
-                input = JSSourceFile.fromCode("fragment" + Integer.toString(scripts.indexOf(sd)),
+                input = SourceFile.fromCode("fragment" + Integer.toString(scripts.indexOf(sd)),
                         ((InternalFragment) sd).getText());
             sources.add(input);
         }
 
-        Result res = compiler.compile(new JSSourceFile[]{}, sources.toArray(new JSSourceFile[]{}), options);
+        Result res = compiler.compile(new ArrayList<SourceFile>(), sources, options);
         if (!res.success)
             throw new JSCompileException();
         String licenses = "";
@@ -94,7 +95,8 @@ public class Compressor {
         for (FragmentDescriptor sd : fragments) {
             try {
                 sb.append(sd.getContentText(request));
-                if (sd instanceof ExternalFragment) sb.append("\n");
+                if (sd instanceof ExternalFragment)
+                    sb.append("\n");
             } catch (IOException e) {
                 throw new JSCompileException(e);
             }
@@ -103,7 +105,7 @@ public class Compressor {
     }
 
     public static String minifyJs(List<FragmentDescriptor> scripts, CompressorSettings settings,
-                                  IRequestProxy request) throws JSCompileException {
+            IRequestProxy request) throws JSCompileException {
         String result = unify(scripts, request);
         try {
             StringWriter sw = new StringWriter();
@@ -117,11 +119,11 @@ public class Compressor {
     }
 
     public static String unifyCss(List<FragmentDescriptor> fragments, List<FragmentDescriptor> deps,
-                                  CompressorSettings settings, IRequestProxy request) throws JSCompileException {
+            CompressorSettings settings, IRequestProxy request) throws JSCompileException {
         StringBuilder sb = new StringBuilder();
         for (FragmentDescriptor sd : fragments) {
             try {
-                String relativePath = (sd instanceof ExternalFragment)?((ExternalFragment)sd).getFolderPath():null;
+                String relativePath = (sd instanceof ExternalFragment) ? ((ExternalFragment) sd).getFolderPath() : null;
                 if (relativePath == null || relativePath.trim().equals(""))
                     sb.append(sd.getContentText(request));
                 else
@@ -134,14 +136,14 @@ public class Compressor {
     }
 
     public static String minifyCss(List<FragmentDescriptor> fragments, List<FragmentDescriptor> deps,
-                                   CompressorSettings settings, IRequestProxy request) throws JSCompileException {
+            CompressorSettings settings, IRequestProxy request) throws JSCompileException {
         String result = unifyCss(fragments, deps, settings, request);
         CSSFastMin cssMin = new CSSFastMin();
         return cssMin.minimize(result);
     }
 
     private static String getLicenses(List<FragmentDescriptor> fragments, CompressorSettings settings,
-                                      IRequestProxy request) throws IOException {
+            IRequestProxy request) throws IOException {
         Set<String> licenses = new HashSet<String>();
         for (FragmentDescriptor fd : fragments) {
             if (fd instanceof ExternalFragment && checkFile(((ExternalFragment) fd).getFilePath(), settings))
@@ -159,7 +161,8 @@ public class Compressor {
             file = PathUtils.clean(file);
             if (filename.startsWith("/") && !file.startsWith("/"))
                 file = "/" + file;
-            if (matches(file, filename)) return true;
+            if (matches(file, filename))
+                return true;
         }
         return false;
     }
@@ -177,17 +180,22 @@ public class Compressor {
 
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
-            states = new boolean[n + 1];       // initialized to false
+            states = new boolean[n + 1]; // initialized to false
             for (int j = 0; j < n; j++) {
                 char p = pattern.charAt(j);
 
                 // hack to handle *'s that match 0 characters
-                if (old[j] && (p == '*')) old[j + 1] = true;
+                if (old[j] && (p == '*'))
+                    old[j + 1] = true;
 
-                if (old[j] && (p == c)) states[j + 1] = true;
-                if (old[j] && (p == '?')) states[j + 1] = true;
-                if (old[j] && (p == '*')) states[j] = true;
-                if (old[j] && (p == '*')) states[j + 1] = true;
+                if (old[j] && (p == c))
+                    states[j + 1] = true;
+                if (old[j] && (p == '?'))
+                    states[j + 1] = true;
+                if (old[j] && (p == '*'))
+                    states[j] = true;
+                if (old[j] && (p == '*'))
+                    states[j + 1] = true;
             }
             old = states;
         }
@@ -219,11 +227,13 @@ public class Compressor {
                             state = 2;
                             sb.append(line).append("\n");
                         }
-                    } else break;
+                    } else
+                        break;
                 } else if (state == 1) {
                     if (line.trim().startsWith("//"))
                         sb.append(line).append("\n");
-                    else break;
+                    else
+                        break;
                 } else if (state == 2) {
                     if (line.contains("*/")) {
                         state = 3;
@@ -238,7 +248,9 @@ public class Compressor {
         } finally {
             fileHandle.close();
         }
-        if (state == 2) return "";
-        else return sb.toString();
+        if (state == 2)
+            return "";
+        else
+            return sb.toString();
     }
 }

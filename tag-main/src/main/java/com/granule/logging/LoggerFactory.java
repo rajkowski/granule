@@ -30,7 +30,6 @@ public class LoggerFactory {
 	private static Logger determineDefaultLogger(String name) {
         if (isClassAvailable("org.slf4j.impl.StaticLoggerBinder")) {
 			if (isClassAvailable("org.slf4j.impl.JDK14LoggerFactory")) return new JavaLogger(name);
-			if (isClassAvailable("org.slf4j.impl.Log4jLoggerFactory")) return new Log4JLogger(name);
 			if (!isClassAvailable("org.slf4j.impl.JCLLoggerFactory")) return new SLF4JLogger(name);
 			// fall through to next check if SLF4J is configured to use JCL
 		}
@@ -43,10 +42,8 @@ public class LoggerFactory {
             }
 
             if (logClassName.equals("org.apache.commons.logging.impl.Jdk14Logger")) return new JavaLogger(name);
-			if (logClassName.equals("org.apache.commons.logging.impl.Log4JLogger")) return new Log4JLogger(name);
 			return new JCLLogger(name);
 		}
-		if (isClassAvailable("org.apache.log4j.Logger")) return new Log4JLogger(name);
 		return new JavaLogger(name);
 	}
 

@@ -20,6 +20,6 @@
 
 Useful Tags libs for compressing JavaScript and CSS for JSP, Groovy, JSF.
 
-Requires Java 10 or higher.
+Requires Java 17 or higher.
 
 Build: mvn install

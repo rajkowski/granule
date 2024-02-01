@@ -13,7 +13,7 @@
     <property name="distfile" value="${build.dir}/${ant.project.name}${version}.zip"/>
     <property name="webinf" value="../jsp-demo/web/WEB-INF"/>
     
-    <property name="target-jdk" value="1.5"/>
+    <property name="target-jdk" value="17"/>
 
     <!-- set the classpath for the project              -->
     <!-- this includes the generated source class files -->
