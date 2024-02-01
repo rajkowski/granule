@@ -7,9 +7,6 @@ The granule solution includes:
   *   JSP Tag library. You just need put the tag around your StyleSheets and JavaScripts to compress and combine them.
   *   Ant task, to include pre-compressing in your build scripts. 
 
-
-![Example](https://sites.google.com/site/granuletag/_/rsrc/1297244554577/home/demojsphtml.png)
-
 Granule can automatically choose minimization algorithms by content from simple whitespace removal algorithms to advanced methods as Google Closure Compiler. It helps integrate Google Closure Library by automatically calculating dependencies between JS files and providing caching or pre-compiling capabilities. 
 
 The library organizes work with large sets of web files. It has two modes: development and production, configuration of those can be tuned separately up to turning off any effect of the library at all. 
