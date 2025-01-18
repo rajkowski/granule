@@ -3,7 +3,4 @@ build
 *.ipr
 *.iml
 *.iws
-MyEclipse
-classes
-*.developer.properties
-/tag-main/target/
+target
