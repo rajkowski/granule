@@ -3,11 +3,39 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.rajkowski</groupId>
-    <artifactId>granule</artifactId>
-    <version>1.0.20-SNAPSHOT</version>
+    <artifactId>granule-tag</artifactId>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
-    <name>granule</name>
-    <url>https://github.com/rajkowski/Granule</url>
+    <name>granule-tag</name>
+    <url>https://github.com/rajkowski/granule</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/rajkowski/granule/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Github Actions</system>
+        <url>https://github.com/rajkowski/granule/actions</url>
+    </ciManagement>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/rajkowski/granule</url>
+        </repository>
+    </distributionManagement>
+    <developers>
+        <developer>
+            <id>rajkowski</id>
+            <name>Matt Rajkowski</name>
+            <url>https://github.com/rajkowski/granule</url>
+            <roles>
+                <role>Lead developer</role>
+            </roles>
+        </developer>
+    </developers>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -15,24 +43,21 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.16</version>
+            <version>2.0.17</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>2.0.16</version>
+            <version>2.0.17</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>2.0.16</version>
+            <version>2.0.17</version>
         </dependency>
         <dependency>
             <groupId>args4j</groupId>
@@ -53,7 +78,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.17.2</version>
+            <version>1.18.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.taglibs</groupId>
@@ -68,13 +93,13 @@
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jsp-api</artifactId>
-            <version>9.0.98</version>
+            <version>9.0.102</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-servlet-api</artifactId>
-            <version>9.0.98</version>
+            <version>9.0.102</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
