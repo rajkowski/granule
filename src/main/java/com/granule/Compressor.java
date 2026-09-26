@@ -1,4 +1,5 @@
 /*
+ * Copyright 2026 Matt Rajkowski (https://github.com/rajkowski)
  * Copyright 2010 Granule Inc.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -46,12 +47,12 @@ public class Compressor {
         Compiler compiler = new Compiler();
 
         CompilerOptions options = new CompilerOptions();
-        options.markAsCompiled = true;
+        options.setMarkAsCompiled(true);
         if (settings.getLocale() != null) {
-            options.locale = settings.getLocale();
+            options.setLocale(settings.getLocale());
         }
         options.setPrettyPrint(settings.isFormatPrettyPrint());
-        options.printInputDelimiter = settings.isFormatPrintInputDelimiter();
+        options.setPrintInputDelimiter(settings.isFormatPrintInputDelimiter());
         if (settings.getOptimization() != null) {
             if (settings.getOptimization().equalsIgnoreCase(CompressorSettings.ADVANCED_OPTIMIZATIONS_VALUE))
                 CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options);

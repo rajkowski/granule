@@ -4,12 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.rajkowski</groupId>
     <artifactId>granule</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <packaging>jar</packaging>
     <name>granule</name>
     <description>A Java tag library which packs multiple stylesheets and/or javascript files into one</description>
     <url>https://github.com/rajkowski/granule</url>
     <properties>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <issueManagement>
@@ -48,17 +49,17 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.18</version>
+            <version>2.0.20</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>2.0.18</version>
+            <version>2.0.20</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>2.0.18</version>
+            <version>2.0.20</version>
         </dependency>
         <dependency>
             <groupId>args4j</groupId>
@@ -68,13 +69,13 @@
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.10.17</version>
+            <version>1.10.18</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
-            <version>v20250407</version>
+            <version>v20260923</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -94,13 +95,13 @@
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jsp-api</artifactId>
-            <version>9.0.120</version>
+            <version>9.0.122</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-servlet-api</artifactId>
-            <version>9.0.120</version>
+            <version>9.0.122</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -135,8 +136,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
             <plugin>
